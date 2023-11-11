@@ -12,8 +12,8 @@ import { medicineChange } from '../../api/ChangeOrDelete/medicineChange'
 // 引入删除药品的接口
 import { medicineDelete } from '../../api/ChangeOrDelete/medicineChange'
 import { ElMessage } from 'element-plus'
-// 下载药品图片得接口
-import { downLoadPic } from '../../api/get/index'
+// 引入Excel导入药品
+import { submitMedicine } from '../../api/get/index'
 // 引入baseURL
 // 第几页
 const pageNo = ref(1)
@@ -31,6 +31,10 @@ const dialog = ref(false)
 const dialogAdd = ref(false)
 // 图片的url地址
 const imageUrl = ref()
+// Excel文件名
+let key = ref({
+    fileName: ''
+})
 // token
 const token = localStorage.getItem('user_token')
 // 封装获取全部药品的函数
@@ -75,6 +79,7 @@ const sumitMed = async () => {
     }
     //   关闭dialog
     dialog.value = !dialog.value
+    await getMedical()
 
 }
 // 点击新增按钮的回调(单独新增)
@@ -91,13 +96,13 @@ const addMedicine = async () => {
 }
 // 点击新增的确定回调
 const sumitAdd = async (e) => {
-    console.log(e);
-        // 关闭盒子
+    // 关闭盒子
     dialogAdd.value = !dialogAdd.value
+
     await medicineAdd(drugDetailList)
-        // 再次获取数据
+    // 再次获取数据
     getMedical()
-    
+    ElMessage.success("添加成功")
 
 }
 // 点击取消的回调
@@ -105,12 +110,10 @@ const cancelAdd = () => {
     dialogAdd.value = !dialogAdd.value
 }
 // 上传成功的回调
-const partmentHandSuccess = async(res) => {
-    console.log(res);
+const partmentHandSuccess = async (res) => {
+    console.log(res)
     imageUrl.value = res.data
     drugDetailList.img = imageUrl.value
-    // 下载图片
-    await downLoadPic(imageUrl.value)
 }
 // 表单校验规则
 const updateRules = {
@@ -122,6 +125,16 @@ const updateRules = {
         { type: 'number|string', message: '价格必须为数字!' },
     ]
 }
+// Excel文件导入药品的按钮回调
+const handleUploadSuccess = async(res) => {
+    key.value.fileName = res.data
+    let result = await submitMedicine(key.value.fileName)
+    if(result.data === "添加成功"){
+        ElMessage.success("添加成功~")
+    }
+    // 刷新页面
+    getMedical()
+}
 </script>
 
 <template>
@@ -129,6 +142,11 @@ const updateRules = {
         <div class="allBtn">
             <!-- 单独新增 -->
             <el-button type="primary" :icon="Plus" @click="addMedicine">新增药品</el-button>
+            <!-- 通过Excel文件新增 -->
+            <el-upload class="upload-demo" :action="`${baseURL}/common/upload/excel`" multiple :headers="{ token: token }"
+                :on-success="handleUploadSuccess">
+                <el-button type="success" :icon="Plus">Excel文件导入药品</el-button>
+            </el-upload>
         </div>
     </el-card>
     <el-card style="margin-top: 5px;">
@@ -158,7 +176,6 @@ const updateRules = {
         <el-pagination v-model:current-page="pageNo" v-model:page-size="limit" :page-sizes="[5, 10, 15]" :background="true"
             layout=" prev, pager, next, jumper,->,sizes,total" :total="total" @size-change="getMedical()"
             @current-change="getMedical()" />
-
         <!-- 修改dialog -->
         <el-dialog v-model="dialog" title="修改药品" width="30%" center>
             <el-form :rules="updateRules" :model="drugDetailList" label-position="left" label-width="80px">
@@ -169,7 +186,8 @@ const updateRules = {
                     <el-input v-model="drugDetailList.price" placeholder="请输入药品单价" />
                 </el-form-item>
                 <el-form-item label="药品图片">
-                    <el-upload class="avatar-uploader" :action="`${baseURL}/common/upload`" :show-file-list="false">
+                    <el-upload class="avatar-uploader" :action="`${baseURL}/common/upload/img`" :show-file-list="false"
+                        :on-success="partmentHandSuccess" :headers="{ token: token }">
                         <img v-if="imageUrl" :src="`${drugDetailList.img}`" class="avatar" />
                     </el-upload>
                 </el-form-item>
@@ -198,17 +216,11 @@ const updateRules = {
                             on-remove：删除图片
                             before-upload：在文件上传之前的回调
                             -->
-                    <el-upload 
-                        list-type="picture-card"
-                        :on-preview="handlePictureCardPreview"
-                        :action="`${baseURL}/common/upload/img`"
-                        :show-file-list="false" 
-                        :headers="{ token: token }" 
-                        :on-success="partmentHandSuccess"
-                        >
-                        <img style="width: 100%;height: 100%;" v-if="imageUrl" :src="`${baseURL}/img/drug/${drugDetailList.img}`" />
+                    <el-upload list-type="picture-card" :action="`${baseURL}/common/upload/img`" :show-file-list="false"
+                        :headers="{ token: token }" :on-success="partmentHandSuccess">
+                        <img style="width: 100%;height: 100%;" v-if="imageUrl" :src="`${drugDetailList.img}`" />
                         <el-icon v-else class="el-upload-list__item-actions">
-                                <Plus />
+                            <Plus />
                         </el-icon>
                     </el-upload>
                 </el-form-item>
@@ -223,7 +235,7 @@ const updateRules = {
     </el-card>
 </template>
 <style scoped lang="scss">
-.allBtn {   
+.allBtn {
     display: flex;
     align-items: center;
 

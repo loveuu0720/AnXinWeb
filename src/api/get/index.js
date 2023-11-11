@@ -79,4 +79,15 @@ export const downLoadPic = (name)=>{
     })
 }
 
+// Excel批量导入药品
+export const submitMedicine = (key)=>{
+    return request({
+        url:'/drug/excle',
+        method:'GET',
+        params:{
+            filename:key
+        }
+    })
+}
+
 

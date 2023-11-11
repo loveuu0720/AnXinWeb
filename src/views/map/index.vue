@@ -30,12 +30,12 @@ const getMap = () => {
         key: "e16ba1e84eccc96c29f9022932e25c96", // 申请好的Web端开发者Key，首次调用 load 时必填
         version: "2.0", // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
         plugins: [
-                'AMap.ToolBar'
-                ,'AMap.Scale'
-                ,'AMap.HawkEye'
-                ,'AMap.MapType'
-                ,'AMap.Geolocation'
-            ], // 需要使用的的插件列表，如比例尺'AMap.Scale'等
+            'AMap.ToolBar'
+            , 'AMap.Scale'
+            , 'AMap.HawkEye'
+            , 'AMap.MapType'
+            , 'AMap.Geolocation'
+        ], // 需要使用的的插件列表，如比例尺'AMap.Scale'等
     })
         .then((AMap) => {
             currentAMap = AMap
@@ -76,14 +76,14 @@ const getLaAndLo = () => {
         // 清除地图上的所有覆盖物
         map.value.clearMap()
         // 调整地图的缩放级别以及位置
-        map.value.setZoomAndCenter(14, position )
+        map.value.setZoomAndCenter(14, position)
         // 获取全部医院信息
         getAllHosptal().then((res) => {
             HosptalArr.value = res.data
             // 循环遍历所有的医院信息
             HosptalArr.value.forEach(el => {
-               let laAndLong =  (el.latitudeAndLongitude).split(',').map(item=>Number(item));
-                
+                let laAndLong = (el.latitudeAndLongitude).split(',').map(item => Number(item));
+
                 // 创建marker   
                 const marker = new currentAMap.Marker({
                     position: laAndLong,   // 经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
@@ -104,7 +104,7 @@ const getLaAndLo = () => {
                     let infoWindow = new currentAMap.InfoWindow({
                         content, //传入 dom 对象，或者 html 字符串
                         offset: new currentAMap.Pixel(0, -30)
-                    }); 
+                    });
                     infoWindow.open(map.value, e.target.getPosition());
                 })
             });
@@ -124,12 +124,12 @@ onMounted(() => {
 
 <template>
     <!-- 输入地址拿到经纬度 -->
-    <el-card>
+    <el-card class="card">
         <el-form label-width="50px" inline>
             <el-form-item label="地址" style="font-weight: 700;">
                 <el-input v-model="address" placeholder="请输入地址" :prefix-icon="Search" clearable
                     style="width: 300px;"></el-input>
-            </el-form-item> 
+            </el-form-item>
             <el-form-item>
                 <el-button type="primary" @click="getLaAndLo" :disabled="!address">获取该位置的经纬度</el-button>
             </el-form-item>
@@ -140,9 +140,14 @@ onMounted(() => {
     </el-card>
 </template>
 
-<style scoped>
-#container {
-    width: 100%;
-    height: 700px;
+<style scoped lang="scss">
+.card {
+    width: 82vw;
+    height: 83vh;
+
+    #container {
+        width: 82vw;
+        height: 75vh;
+    }
 }
 </style>
