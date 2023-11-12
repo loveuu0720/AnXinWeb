@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { Delete, Plus, HelpFilled } from '@element-plus/icons-vue'
+import { Search, Delete, Plus, HelpFilled,RefreshRight } from '@element-plus/icons-vue'
 import { ref, onMounted, reactive } from 'vue'
 import { getAllHospital } from '../../api/get/index'
 import { deleteHspAndPart } from '../../api/DeleteUser/deletehospital'
@@ -7,9 +7,9 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { submitHospital } from '../../api/get/index'
 import { getHspPart } from '../../api/get/index'
 import { submitPartment } from '../../api/get/index'
+import { searchHospital } from '../../api/Search/searchHospital'
 // 引入baseURL
 import { baseURL } from '../../utils/request'
-
 // 存放医院数据
 let hspArr = ref()
 // 存放科室的数据
@@ -28,6 +28,8 @@ let key = ref({
 let token = ref()
 // 抽屉组件的开关
 const drawer = ref(false)
+// 医院名关键字
+const hospitalName = ref('')
 // 封装请求医院列表
 const getHspArr = async () => {
     let res = await getAllHospital(pageNo.value, limit.value)
@@ -79,17 +81,42 @@ const partmentHandSuccess = async (res) => {
 
 }
 // 分页器页数切换回调
-const changeSize = ()=>{
+const changeSize = () => {
+    getHspArr()
+}
+// 点击搜索按钮的回调
+const searchUser = async() =>{
+    let res =  await searchHospital(hospitalName.value)
+    hspArr.value = res.data
+}
+// 点击取消搜索的回调
+const reset = ()=>{
     getHspArr()
 }
 </script>
 
 <template>
-    <el-card>
-        <el-upload class="upload-demo" :action="`${baseURL}/common/upload/excel`" multiple
-            :headers="{ token: token }" :on-success="handleUploadSuccess">
-            <el-button type="primary" :icon="Plus">批量导入Excel文件医院</el-button>
-        </el-upload>
+    <el-card class="el_card">
+        <div class="box">
+            <div class="left">
+                <el-form :inline="true">
+                    <el-form-item label="查询医院">
+                        <el-input placeholder="请输入医院名称" v-model="hospitalName"></el-input>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button type="primary" size="default" title="请添加搜索条件" @click="searchUser"
+                            :icon="Search">搜索</el-button>
+                        <el-button :icon="RefreshRight" @click="reset">重置</el-button>
+                    </el-form-item>
+                </el-form>
+            </div>
+            <div class="right">
+                <el-upload class="upload-demo" :action="`${baseURL}/common/upload/excel`" multiple
+                    :headers="{ token: token }" :on-success="handleUploadSuccess">
+                    <el-button type="success" :icon="Plus">批量导入Excel文件医院</el-button>
+                </el-upload>
+            </div>
+        </div>
     </el-card>
     <el-card style="margin-top: 10px">
         <el-table border style="margin: 10px 0px" :data="hspArr">
@@ -118,8 +145,8 @@ const changeSize = ()=>{
     <el-drawer v-model="drawer" :title="`旗下科室`" direction="rtl" :before-close="handleClose">
         <template #header>
             <h4 class="title">旗下医院全部科室</h4>
-            <el-upload class="upload-demo" :action="`${baseURL}/common/upload`" multiple
-                :on-success="partmentHandSuccess" :headers="{ token: token }">
+            <el-upload class="upload-demo" :action="`${baseURL}/common/upload`" multiple :on-success="partmentHandSuccess"
+                :headers="{ token: token }">
                 <el-button class="btn" type="info" @click="">导入Excel科室</el-button>
             </el-upload>
         </template>
@@ -132,6 +159,16 @@ const changeSize = ()=>{
 </template>
 
 <style scoped lang="scss">
+.box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 30px;
+    .left {
+        margin-top: 20px;
+    }
+}
+
 .upload-demo {
     margin-bottom: -10px;
 }

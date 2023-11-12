@@ -46,8 +46,8 @@ const changeSize = () => {
           <el-table-column label="状态" align="center" width="383px">
             <template #default="{ row, $index }">
               <el-select v-model="row.status" disabled>
-                <el-option label="未付款" value="-2">申请退款中</el-option>
-                <el-option label="未付款" value="-1">已退款</el-option>
+                <el-option label="申请退款中" value="-2">申请退款中</el-option>
+                <el-option label="已退款" value="-1">已退款</el-option>
                 <el-option label="未付款" value="0">未付款</el-option>
                 <el-option label="已支付" value="1">已支付</el-option>
                 <el-option label="待接单" value="2">待接单</el-option>

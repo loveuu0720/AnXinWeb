@@ -1,5 +1,5 @@
 <script setup lang='ts'>
-import { Edit, Delete, Plus } from '@element-plus/icons-vue'
+import { Search, Delete, Plus, HelpFilled, RefreshRight } from '@element-plus/icons-vue'
 import { ref, onMounted, reactive } from 'vue'
 // 引入获取全部药品的接口
 import { getAllMedical } from '../../api/get/index'
@@ -14,7 +14,8 @@ import { medicineDelete } from '../../api/ChangeOrDelete/medicineChange'
 import { ElMessage } from 'element-plus'
 // 引入Excel导入药品
 import { submitMedicine } from '../../api/get/index'
-// 引入baseURL
+// 引入模糊搜索药品
+import { searchDrop } from '../../api/Search/searchDrop'
 // 第几页
 const pageNo = ref(1)
 // 多少条
@@ -35,6 +36,8 @@ const imageUrl = ref()
 let key = ref({
     fileName: ''
 })
+// 模糊搜索药品关键字
+let dropName = ref('')
 // token
 const token = localStorage.getItem('user_token')
 // 封装获取全部药品的函数
@@ -126,27 +129,52 @@ const updateRules = {
     ]
 }
 // Excel文件导入药品的按钮回调
-const handleUploadSuccess = async(res) => {
+const handleUploadSuccess = async (res) => {
     key.value.fileName = res.data
     let result = await submitMedicine(key.value.fileName)
-    if(result.data === "添加成功"){
+    if (result.data === "添加成功") {
         ElMessage.success("添加成功~")
     }
     // 刷新页面
     getMedical()
+}
+// 点击搜索按钮的回调
+const searchUser  = async()=>{
+   let res =  await searchDrop(dropName.value)
+   drugList.value = res.data
+   
+}
+// 点击重置按钮的回调
+const reset = async()=>{
+    getMedical()
+    dropName.value = ''
 }
 </script>
 
 <template>
     <el-card>
         <div class="allBtn">
-            <!-- 单独新增 -->
-            <el-button type="primary" :icon="Plus" @click="addMedicine">新增药品</el-button>
-            <!-- 通过Excel文件新增 -->
-            <el-upload class="upload-demo" :action="`${baseURL}/common/upload/excel`" multiple :headers="{ token: token }"
-                :on-success="handleUploadSuccess">
-                <el-button type="success" :icon="Plus">Excel文件导入药品</el-button>
-            </el-upload>
+            <div class="left">
+                <el-form :inline="true">
+                    <el-form-item label="查询药品">
+                        <el-input placeholder="请输入药品名称" v-model="dropName"></el-input>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button type="primary" size="default" title="请添加搜索条件" @click="searchUser"
+                            :icon="Search">搜索</el-button>
+                        <el-button :icon="RefreshRight" @click="reset">重置</el-button>
+                    </el-form-item>
+                </el-form>
+            </div>
+            <div class="right">
+                <!-- 单独新增 -->
+                <el-button type="primary" :icon="Plus" @click="addMedicine">新增药品</el-button>
+                <!-- 通过Excel文件新增 -->
+                <el-upload class="upload-demo" :action="`${baseURL}/common/upload/excel`" multiple
+                    :headers="{ token: token }" :on-success="handleUploadSuccess">
+                    <el-button type="success" :icon="Plus">Excel文件导入药品</el-button>
+                </el-upload>
+            </div>
         </div>
     </el-card>
     <el-card style="margin-top: 5px;">
@@ -238,6 +266,17 @@ const handleUploadSuccess = async(res) => {
 .allBtn {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    height: 30px;
+    .left {
+        margin-top: 20px;
+    }
+
+    .right {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 
     .upload-demo {
         margin-left: 20px;

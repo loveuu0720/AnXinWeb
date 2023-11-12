@@ -8,7 +8,7 @@ import { getDetail } from '../../api/getAllOrder/buyOrder'
 // 存储当前页面|条数
 const pageNo = ref({
     page: 1,
-    pageSize: 5
+    pageSize: 10
 })
 // 总条数
 const total = ref(1)
@@ -22,7 +22,7 @@ const drawer = ref(false)
 const getAllOrder = async () => {
     let res = await buyMedicine(pageNo.value)
     buyOrderArr.value = res.data.records
-    total.value = res.data.records.length
+    total.value = Number(res.data.total)
 }
 // 页面挂载钩子函数
 onMounted(() => {
@@ -33,8 +33,6 @@ const getMeDetail = async (id: any) => {
     // 打开抽屉
     drawer.value = !drawer.value
     let res = await getDetail(id)
-    console.log(res);
-
     buyOrderList.value = res.data
     console.log(buyOrderList.value);
 
@@ -44,7 +42,7 @@ const getMeDetail = async (id: any) => {
 <template>
     <transition>
         <el-card style="margin-top: 10px">
-            <h1 class="title">买药 订单管理</h1>
+            <h1 class="title">买药订单管理</h1>
             <el-table border :data="buyOrderArr" stripe style="width: 100%">
                 <el-table-column type="selection" width="55" />
                 <el-table-column type="index" label="序号" width="55" align="center" />
@@ -73,7 +71,8 @@ const getMeDetail = async (id: any) => {
             </el-table>
             <!-- 分页器 -->
             <el-pagination v-model:current-page="pageNo.page" v-model:page-size="pageNo.pageSize" :page-sizes="[5, 10, 15]"
-                :background="true" layout=" prev, pager, next, jumper,->,sizes,total" :total="total" />
+                :background="true" layout=" prev, pager, next, jumper,->,sizes,total" :total="total" @size-change="getAllOrder()"
+                @current-change="getAllOrder()" />
             <!-- 抽屉组件：显示详情 -->
             <el-drawer class="drawer" v-model="drawer" direction="rtl" size="40%">
                 <h2 class="title">药品简介</h2>

@@ -90,4 +90,13 @@ export const submitMedicine = (key)=>{
     })
 }
 
+// 修改预约订单
+export const changeDoctor = (data) => {
+    return request({
+        url: '/order/modify',
+        method: 'post',
+        data:data
+    })
+}
+
 

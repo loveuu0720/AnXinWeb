@@ -9,7 +9,7 @@ import { ElMessage } from 'element-plus';
 // 定义获取的页数|当前页数
 const pageNo = ref({
     page: 1,
-    pageSize: 5
+    pageSize: 10
 })
 // 总页数
 const total = ref(0)
@@ -25,8 +25,10 @@ onMounted(() => {
 // 封装获取全部订单数据的接口
 const getAllSend = async () => {
     let res = await sendMedicine(pageNo.value)
+    console.log(res);
+    
     sendOrderArr.value = res.data.records
-    total.value = res.data.records.length
+    total.value = Number(res.data.total)
 }
 // 点击编辑按钮的回调
 const editSend = (row: any) => {
@@ -49,12 +51,13 @@ const cancel = ()=>{
     <el-card style="margin-top: 10px">
         <h1 class="title">寄药订单管理</h1>
         <el-table border :data="sendOrderArr" stripe style="width: 100%">
+            <el-table-column type="index" label="序号" align="center" width="70px" />
             <el-table-column prop="id" label="寄药订单id" align="center" />
             <el-table-column prop="prescriptionId" label="处方订单id" align="center" />
             <el-table-column prop="patientUserName" label="患者姓名" align="center" />
             <el-table-column prop="patientUserId" label="患者id" align="center" />
             <el-table-column prop="phone" label="手机号" align="center" />
-            <el-table-column prop="address" label="Address" align="center" />
+            <el-table-column prop="address" label="地点" align="center" />
             <el-table-column prop="freight" label="运费" align="center" />
             <el-table-column prop="state" label="订单状态" width="240px" align="center">
                 <template #default="{ row, $index }">
@@ -74,7 +77,8 @@ const cancel = ()=>{
         </el-table>
         <!-- 分页器 -->
         <el-pagination v-model:current-page="pageNo.page" v-model:page-size="pageNo.pageSize" :page-sizes="[5, 10, 15]"
-            :background="true" layout=" prev, pager, next, jumper,->,sizes,total" :total="total" />
+            :background="true" layout=" prev, pager, next, jumper,->,sizes,total" :total="total" @size-change="getAllSend()"
+                @current-change="getAllSend()" />
 
         <!-- dialog组件 -->
         <el-dialog v-model="dialog" title="寄快递">
