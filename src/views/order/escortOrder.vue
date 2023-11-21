@@ -7,7 +7,7 @@ let total = ref(1)
 // 当前页数
 let pageNo = ref(1)
 // 每页的数量
-let limit = ref(5)
+let limit = ref(10)
 // 订单数据（数组）
 let orderList = ref([])
 /**
@@ -58,7 +58,7 @@ const changeSize = () => {
           </el-table-column>
         </el-table>
         <!-- 分页器 -->
-        <el-pagination v-model:current-page="pageNo" v-model:page-size="limit" :page-sizes="[5, 10, 15]"
+        <el-pagination v-model:current-page="pageNo" v-model:page-size="limit" :page-sizes="[10, 15,20]"
           :background="true" layout=" prev, pager, next, jumper,->,sizes,total" :total="total" @size-change="changeSize"
           @current-change="getEscortOrder()" />
       </el-card>

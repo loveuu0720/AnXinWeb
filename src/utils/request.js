@@ -2,7 +2,7 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 // 引入进度条
 import { start,close } from '@/utils/nprogress'
-export const baseURL = 'http://mypu28.natappfree.cc'
+export const baseURL = 'http://e6iw8x.natappfree.cc'
 const httpsRequest = axios.create({
   // TODO 1. 基础地址，超时时间
   baseURL: baseURL,
