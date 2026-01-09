@@ -32,9 +32,15 @@ const drawer = ref(false)
 const hospitalName = ref('')
 // 封装请求医院列表
 const getHspArr = async () => {
-    let res = await getAllHospital(pageNo.value, limit.value)
-    hspArr.value = res.data.records
-    total.value = parseInt(res.data.total)
+    try {
+        let res = await getAllHospital(pageNo.value, limit.value)
+        if (res && res.data) {
+            hspArr.value = res.data.records || []
+            total.value = parseInt(res.data.total || 0)
+        }
+    } catch (error) {
+        console.error('Failed to fetch hospital list:', error)
+    }
 }
 // 页面挂载钩子函数
 onMounted(() => {
@@ -56,11 +62,17 @@ const handleUploadSuccess = async (res) => {
 }
 // 点击查看旗下科室的按钮
 const getPartment = async (name) => {
-    // 转换格式
-    let res = await getHspPart(name, pageNo.value, limit.value)
-    partment = res.data.records
-    // 打开抽屉
-    drawer.value = !drawer.value
+    try {
+        // 转换格式
+        let res = await getHspPart(name, pageNo.value, limit.value)
+        if (res && res.data) {
+            partment = res.data.records || []
+            // 打开抽屉
+            drawer.value = !drawer.value
+        }
+    } catch (error) {
+        console.error('Failed to fetch department list:', error)
+    }
 }
 // 点击抽屉外关闭抽屉的提示回调
 const handleClose = (done: () => void) => {

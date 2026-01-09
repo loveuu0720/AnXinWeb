@@ -22,12 +22,17 @@ let charts3 = ref()
 let charts4 = ref()
 // 获取数据的请求
 const getInfo = async () => {
-    let res = await echartsInfo()
-    console.log(res)
-    runNum1.value = res.data[0]
-    runNum2.value = res.data[1]
-    runNum3.value = res.data[2]
-    runNum4.value = res.data[3]
+    try {
+        let res = await echartsInfo()
+        if (res && res.data && Array.isArray(res.data)) {
+            runNum1.value = res.data[0] || 0
+            runNum2.value = res.data[1] || 0
+            runNum3.value = res.data[2] || 0
+            runNum4.value = res.data[3] || 0
+        }
+    } catch (error) {
+        console.error('Failed to fetch echarts info:', error)
+    }
 }
 onMounted(async() => {
     // 获取数据(患者)

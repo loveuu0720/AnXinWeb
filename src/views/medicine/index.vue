@@ -42,9 +42,15 @@ let dropName = ref('')
 const token = localStorage.getItem('user_token')
 // 封装获取全部药品的函数
 const getMedical = async () => {
-    let res = await getAllMedical(pageNo.value, limit.value)
-    drugList.value = res.data.records
-    total.value = parseInt(res.data.total)
+    try {
+        let res = await getAllMedical(pageNo.value, limit.value)
+        if (res && res.data) {
+            drugList.value = res.data.records || []
+            total.value = parseInt(res.data.total || 0)
+        }
+    } catch (error) {
+        console.error('Failed to fetch medical list:', error)
+    }
 }
 // 页面挂载就获取
 onMounted(() => {

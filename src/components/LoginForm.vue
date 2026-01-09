@@ -19,16 +19,24 @@ const username = ref()
 const submit = async () => {
   let res1 =  await form.value.validate()
   console.log(res1);
-  const res = await staffUserLogin(formModel)
-  // 存放用户名
-  username.value = res.data
-  // 本地存储token
-  token.value = res.map.token
-  localStorage.setItem('user_token',token.value)
-  // 本地存储用户名
-  localStorage.setItem('name',username.value)
-  ElMessage.success("登录成功！")
-  router.push('/')
+  try {
+    const res = await staffUserLogin(formModel)
+    if (res && res.data) {
+      // 存放用户名
+      username.value = res.data
+      // 本地存储token
+      token.value = res.map?.token
+      localStorage.setItem('user_token', token.value)
+      // 本地存储用户名
+      localStorage.setItem('name', username.value)
+      ElMessage.success("登录成功！")
+      router.push('/')
+    } else {
+      ElMessage.error(res?.msg || "登录失败，请检查用户名或密码")
+    }
+  } catch (error) {
+    console.error('Login error:', error)
+  }
 }
 
 // 表单校验规则
