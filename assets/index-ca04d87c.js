@@ -1,0 +1,1 @@
+import{h as r}from"./request-c66eae3e.js";const d=t=>r({url:"/doctor/add",method:"post",data:t}),e=t=>r({url:"/traineruser",method:"post",data:t}),s=t=>r({url:"/patientuser",method:"post",data:t}),a=t=>r({url:"/employee",method:"post",data:t}),u=t=>r({url:"/drug/add",method:"post",data:t});export{d as a,e as b,s as c,a as d,u as m};
